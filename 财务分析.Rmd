@@ -1,0 +1,79 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-01-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+```{r}
+calc_NPV <- function(annual_revenue, i=0.05, lifetime_yrs, CAPEX, OPEX=0) {
+  costs_op <- rep(OPEX, lifetime_yrs)  # operating cost
+  revenue <- rep(annual_revenue, lifetime_yrs)
+  t <- seq(1, lifetime_yrs, 1)  # output: 1, 2, 3, ..., lifetime_yrs
+
+  NPV <- sum((revenue - costs_op) / (1 + i)^t) - CAPEX
+  return(round(NPV, 0))
+}
+# 输入数据
+annual_revenue <- 821595.6550 * 10^4  # 将万 USD 转换为 USD
+CAPEX <- 3311188.21 * 10^4  # 将万 USD 转换为 USD
+lifetime_yrs <- 25
+i <- 0.05
+OPEX <- 0
+# 计算净现值
+npv <- calc_NPV(annual_revenue, i, lifetime_yrs, CAPEX, OPEX)
+print(npv)
+# 判断是否支持项目
+ifelse(npv > 0, "Support", "Object")
+
+```
+
+```{r}
+# 定义生命周期发电量计算函数
+Life_span_generation_kWH <- function(yearly_generation_kWH, discount = 0.03, lifetime_yrs = 25) {
+  t <- seq(1, lifetime_yrs, 1)  # 时间序列从 1 到生命周期年份
+  L_S_G <- sum(yearly_generation_kWH / (1 + discount)^t)  # 折现后的发电量
+  return(round(L_S_G, 0))
+}
+# 定义 LCOE 计算函数
+LCOE <- function(NPV_cost, Life_span_generation) {
+  lcoe <- NPV_cost / Life_span_generation  # 平准化发电成本
+  return(round(lcoe, 2))
+}
+# 输入数据
+CAPEX <- 3311188.21 * 10^4  # 将 CAPEX 从 "万USD" 转换为 USD
+annual_generation <- 1.0399945*10^11 # 年发电量 kWh
+discount_rate <- 0.03  # 折现率
+lifetime_yrs <- 25  # 项目生命周期
+# 计算生命周期发电量
+life_span_generation <- Life_span_generation_kWH(yearly_generation_kWH=annual_generation)
+# 计算 LCOE
+lcoe <- LCOE(CAPEX, life_span_generation)
+# 输出结果
+cat("生命周期发电量 (kWh):", life_span_generation, "\n")
+cat("平准化发电成本 (USD/kWh):", lcoe, "\n")
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

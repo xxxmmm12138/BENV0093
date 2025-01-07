@@ -1,0 +1,82 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-01-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+```{r}
+# 安装必要的包
+install.packages("readxl")
+install.packages("ggplot2")
+install.packages("sf")
+install.packages("ggrepel")
+```
+
+```{r}
+# 加载库
+library(readxl)
+library(ggplot2)
+library(sf)
+library(ggrepel)
+```
+
+```{r}
+# 导入数据
+data <- read_excel("C:/Users/Desktop/renewable.xlsx")
+
+# 转换经纬度为数值型
+data$Longitude <- as.numeric(data$longitude)
+data$Latitude <- as.numeric(data$latitude)
+
+# 检查数据结构
+str(data)
+```
+
+```{r}
+# 加载 Shapefile
+indonesia_map <- st_read("C:/Users/Desktop/path_to_your_fileindonesia_boundary.shp")
+
+# 检查地图数据
+print(indonesia_map)
+```
+
+```{r}
+# 绘制地图
+ggplot() +
+  geom_sf(data = indonesia_map, fill = "gray90", color = "gray50") +  # 绘制印尼边界
+  geom_point(data = data, aes(x = longitude, y = latitude, 
+                              size = capacity_mw, color = type,shape = status), alpha = 0.8) + 
+  scale_size(range = c(2, 8), name = "Capacity (MW)") +  # 调整点大小范围
+  scale_color_manual(values = c("Hydro" = "green", "solar" = "blue", "Geothermal" = "orange","wind"="purple")) + 
+  scale_shape_manual(values = c("existing" = 16, "planned" = 17, "shelved" = 15)) + # 状态形状
+  theme_minimal() +
+  labs(title = "Distribution map of renewable energy power plants in Indonesia",
+       x = "Longitude", y = "Latitude") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggrepel::geom_text_repel(data = data, aes(x = longitude, y = latitude, label = plant),
+                           size = 3, max.overlaps = 10)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

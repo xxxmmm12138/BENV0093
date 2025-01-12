@@ -55,7 +55,7 @@ LCOE <- function(NPV_cost, Life_span_generation) {
 }
 # 输入数据
 CAPEX <- 3311188.21 * 10^4  # 将 CAPEX 从 "万USD" 转换为 USD
-annual_generation <- 1.0399945*10^11 # 年发电量 kWh
+annual_generation <- 3.0399945*10^10 # 年发电量 kWh
 discount_rate <- 0.03  # 折现率
 lifetime_yrs <- 25  # 项目生命周期
 # 计算生命周期发电量
